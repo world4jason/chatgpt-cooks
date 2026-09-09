@@ -4,492 +4,63 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <meta name="theme-color" content="#f7f1e7" />
-  <meta name="color-scheme" content="light" />
   <title>蝦・鮮蚵・櫛瓜燉飯｜ChatGPT Cooks</title>
   <style>
-    :root {
-      --bg:#f7f1e7;
-      --card:#fffdf8;
-      --ink:#24211d;
-      --muted:#716a61;
-      --line:#ded5c7;
-      --accent:#b94d35;
-      --accent-soft:#f7e3db;
-      --green:#486a52;
-      --green-soft:#e7efe8;
-      --yellow:#f5e8b9;
-      --shadow:0 10px 28px rgba(51,40,28,.08);
-      --radius:18px;
-      --tap:48px;
-    }
-    *{box-sizing:border-box}
-    html{scroll-behavior:smooth;-webkit-text-size-adjust:100%}
-    body{
-      margin:0;
-      background:var(--bg);
-      color:var(--ink);
-      font-family:ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans TC",sans-serif;
-      line-height:1.65;
-      font-size:17px;
-      padding-bottom:calc(94px + env(safe-area-inset-bottom));
-    }
-    button{font:inherit;color:inherit}
-    button:focus-visible,input:focus-visible{outline:3px solid #3478f6;outline-offset:2px}
-    .wrap{width:min(760px,calc(100% - 28px));margin:0 auto}
-
-    header{padding:calc(18px + env(safe-area-inset-top)) 0 12px}
-    .eyebrow{font-size:.75rem;font-weight:900;letter-spacing:.1em;color:var(--accent)}
-    h1{font-size:clamp(1.8rem,8vw,3.1rem);line-height:1.08;margin:7px 0 8px;letter-spacing:-.035em}
-    .subtitle{margin:0;color:var(--muted);font-size:.96rem}
-    .chips{display:flex;gap:7px;overflow:auto;padding:11px 0 2px;scrollbar-width:none}
-    .chips::-webkit-scrollbar{display:none}
-    .chip{flex:0 0 auto;border:1px solid var(--line);background:#fff8;border-radius:999px;padding:6px 10px;font-size:.78rem;font-weight:800}
-
-    .topbar{
-      position:sticky;top:0;z-index:30;
-      background:rgba(247,241,231,.93);
-      -webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);
-      border-block:1px solid rgba(222,213,199,.85);
-    }
-    .topbar-inner{display:flex;align-items:center;gap:8px;padding:9px 0}
-    .seg{display:flex;background:#e8dfd2;border-radius:12px;padding:3px;flex:0 0 auto}
-    .seg button{min-height:40px;border:0;background:transparent;border-radius:9px;padding:5px 12px;font-weight:850;color:var(--muted)}
-    .seg button.active{background:white;color:var(--ink);box-shadow:0 2px 8px #0001}
-    .wake{min-height:46px;border:1px solid var(--line);border-radius:12px;background:var(--card);padding:7px 11px;font-weight:800;margin-left:auto;white-space:nowrap}
-    .wake.on{background:var(--green-soft);border-color:#b7cfbd;color:#294c35}
-    .progress-mini{height:4px;background:#ded5c7}
-    .progress-mini>div{height:100%;background:var(--green);transition:width .25s ease}
-
-    main{padding:16px 0 26px}
-    .card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow)}
-    .quick-note{padding:14px 15px;margin-bottom:14px;background:var(--yellow);border-color:#e7d794;box-shadow:none;font-size:.9rem}
-    .quick-note strong{font-weight:900}
-
-    .cook-head{display:flex;align-items:flex-end;justify-content:space-between;gap:12px;margin-bottom:10px}
-    .cook-head h2{margin:0;font-size:1.1rem}
-    .step-count{color:var(--muted);font-size:.82rem;font-weight:850}
-
-    .step-card{padding:20px 18px 18px;min-height:390px;display:flex;flex-direction:column}
-    .step-meta{display:flex;gap:8px;align-items:center;margin-bottom:8px}
-    .step-no{display:inline-grid;place-items:center;width:36px;height:36px;border-radius:50%;background:var(--accent);color:white;font-weight:950}
-    .time-pill{background:#efe7da;color:#5d564e;border-radius:999px;padding:4px 9px;font-size:.78rem;font-weight:850}
-    .step-card h3{font-size:1.55rem;line-height:1.22;margin:4px 0 12px;letter-spacing:-.02em}
-    .step-card p{margin:7px 0}
-    .step-card ul{padding-left:1.25rem;margin:8px 0}
-    .cue,.warning,.safe{border-left:4px solid;border-radius:10px;padding:10px 12px;margin:11px 0;font-size:.94rem}
-    .cue{border-color:var(--green);background:var(--green-soft)}
-    .warning{border-color:var(--accent);background:var(--accent-soft)}
-    .safe{border-color:#b48b24;background:#fff3cd}
-    .cue strong,.warning strong,.safe strong{font-weight:900}
-    .step-actions{margin-top:auto;padding-top:14px;display:flex;gap:8px;flex-wrap:wrap}
-    .action-btn{min-height:var(--tap);border-radius:12px;border:1px solid var(--line);background:white;padding:9px 13px;font-weight:850}
-    .action-btn.primary{background:var(--green);color:white;border-color:var(--green)}
-    .action-btn.running{background:#fff3cd;border-color:#e6cf83}
-    .timer-readout{font-variant-numeric:tabular-nums;font-weight:950}
-
-    details{margin-top:14px}
-    details>summary{list-style:none;cursor:pointer;min-height:var(--tap);display:flex;align-items:center;justify-content:space-between;padding:13px 15px;font-weight:900}
-    details>summary::-webkit-details-marker{display:none}
-    details>summary::after{content:"＋";font-size:1.4rem;color:var(--muted)}
-    details[open]>summary::after{content:"−"}
-    .details-body{border-top:1px solid var(--line);padding:10px 15px 16px}
-
-    .ingredient{display:flex;justify-content:space-between;gap:16px;padding:10px 0;border-bottom:1px dashed var(--line)}
-    .ingredient:last-child{border-bottom:0}
-    .qty{text-align:right;font-weight:900;white-space:nowrap}
-    .small{font-size:.85rem;color:var(--muted)}
-
-    .all-steps{display:grid;gap:7px}
-    .all-step{border:0;background:#f3ece1;border-radius:12px;text-align:left;padding:11px 12px;min-height:var(--tap);display:flex;gap:9px;align-items:center}
-    .all-step span:first-child{width:27px;height:27px;display:grid;place-items:center;background:white;border-radius:50%;font-size:.78rem;font-weight:900;flex:0 0 auto}
-    .all-step.current{background:var(--green-soft);box-shadow:inset 0 0 0 2px #b7cfbd}
-    .all-step.done{opacity:.55}
-
-    .bottom-nav{
-      position:fixed;left:0;right:0;bottom:0;z-index:50;
-      padding:8px 12px calc(8px + env(safe-area-inset-bottom));
-      background:rgba(255,253,248,.96);
-      -webkit-backdrop-filter:blur(16px);backdrop-filter:blur(16px);
-      border-top:1px solid var(--line);
-      box-shadow:0 -8px 24px #0000000b;
-    }
-    .bottom-nav-inner{width:min(760px,100%);margin:auto;display:grid;grid-template-columns:1fr 1.7fr;gap:8px}
-    .nav-btn{min-height:56px;border-radius:14px;border:1px solid var(--line);font-weight:950;background:white}
-    .nav-btn.next{background:var(--accent);border-color:var(--accent);color:white}
-    .nav-btn:disabled{opacity:.4}
-
-    .finish{text-align:center;padding:26px 18px}
-    .finish h3{font-size:1.5rem;margin:0 0 8px}
-    .finish p{color:var(--muted)}
-
-    @media(min-width:720px){
-      body{font-size:18px;padding-bottom:110px}
-      .step-card{padding:25px 26px;min-height:430px}
-      .bottom-nav-inner{grid-template-columns:1fr 2fr}
-    }
-    @media print{
-      .topbar,.bottom-nav,.step-actions{display:none}
-      body{padding:0;background:white}
-      .card{box-shadow:none}
-      details{display:block}
-      details>summary{display:none}
-      .details-body{display:block;border:0}
-    }
+    :root{--bg:#f7f1e7;--card:#fffdf8;--ink:#24211d;--muted:#716a61;--line:#ded5c7;--accent:#b94d35;--green:#486a52;--greenSoft:#e7efe8;--orange:#9a5a1f;--orangeSoft:#fff0dc;--redSoft:#f8e2dc;--shadow:0 10px 28px rgba(51,40,28,.08)}
+    *{box-sizing:border-box}html{scroll-behavior:smooth;-webkit-text-size-adjust:100%}body{margin:0;background:var(--bg);color:var(--ink);font-family:ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans TC",sans-serif;line-height:1.62;font-size:17px;padding-bottom:calc(96px + env(safe-area-inset-bottom))}
+    button{font:inherit;color:inherit}.wrap{width:min(760px,calc(100% - 28px));margin:auto}header{padding:calc(18px + env(safe-area-inset-top)) 0 10px}.eyebrow{font-size:.75rem;font-weight:900;letter-spacing:.1em;color:var(--accent)}h1{font-size:clamp(1.8rem,8vw,3.1rem);line-height:1.08;margin:7px 0 8px}.subtitle{margin:0;color:var(--muted);font-size:.96rem}.chips{display:flex;gap:7px;overflow:auto;padding:11px 0 2px}.chip{flex:0 0 auto;border:1px solid var(--line);background:#fff8;border-radius:999px;padding:6px 10px;font-size:.78rem;font-weight:800}
+    .topbar{position:sticky;top:0;z-index:30;background:rgba(247,241,231,.94);backdrop-filter:blur(14px);border-block:1px solid rgba(222,213,199,.85)}.topbar-inner{display:flex;align-items:center;gap:8px;padding:9px 0}.seg{display:flex;background:#e8dfd2;border-radius:12px;padding:3px}.seg button{min-height:42px;border:0;background:transparent;border-radius:9px;padding:5px 12px;font-weight:850;color:var(--muted)}.seg button.active{background:white;color:var(--ink);box-shadow:0 2px 8px #0001}.wake{min-height:44px;border:1px solid var(--line);border-radius:12px;background:var(--card);padding:7px 11px;font-weight:800;margin-left:auto}.wake.on{background:var(--greenSoft);color:#294c35}.progress{height:4px;background:#ded5c7}.progress>div{height:100%;background:var(--green);transition:width .25s}
+    main{padding:16px 0 26px}.card{background:var(--card);border:1px solid var(--line);border-radius:18px;box-shadow:var(--shadow)}.quick{padding:14px 15px;margin-bottom:14px;background:#fff3cd;border-color:#ead795;box-shadow:none;font-size:.9rem}.cook-head{display:flex;align-items:flex-end;justify-content:space-between;margin:0 0 10px}.cook-head h2{margin:0;font-size:1.08rem}.count{font-size:.82rem;color:var(--muted);font-weight:850}.step-card{padding:20px 18px 18px;min-height:430px;display:flex;flex-direction:column}.meta{display:flex;gap:8px;align-items:center}.no{display:grid;place-items:center;width:36px;height:36px;border-radius:50%;background:var(--accent);color:#fff;font-weight:950}.pill{background:#efe7da;border-radius:999px;padding:4px 9px;font-size:.78rem;font-weight:850}.step-card h3{font-size:1.5rem;line-height:1.22;margin:10px 0 10px}.step-card p{margin:7px 0}.step-card ul{margin:8px 0;padding-left:1.2rem}.cue,.heat,.warn,.safe{border-left:4px solid;border-radius:10px;padding:10px 12px;margin:11px 0;font-size:.94rem}.heat{border-color:var(--orange);background:var(--orangeSoft)}.cue{border-color:var(--green);background:var(--greenSoft)}.warn{border-color:var(--accent);background:var(--redSoft)}.safe{border-color:#b48b24;background:#fff3cd}.label{font-size:.78rem;font-weight:950;letter-spacing:.04em;margin-bottom:3px}.actions{margin-top:auto;padding-top:14px;display:flex;gap:8px;flex-wrap:wrap}.action{min-height:48px;border-radius:12px;border:1px solid var(--line);background:white;padding:9px 13px;font-weight:850}.action.running{background:#fff3cd}.readout{font-variant-numeric:tabular-nums;font-weight:950}
+    details{margin-top:14px}summary{list-style:none;cursor:pointer;min-height:48px;display:flex;align-items:center;justify-content:space-between;padding:13px 15px;font-weight:900}summary::-webkit-details-marker{display:none}summary::after{content:"＋";font-size:1.35rem;color:var(--muted)}details[open] summary::after{content:"−"}.details-body{border-top:1px solid var(--line);padding:10px 15px 16px}.ingredient{display:flex;justify-content:space-between;gap:16px;padding:10px 0;border-bottom:1px dashed var(--line)}.qty{text-align:right;font-weight:900}.small{font-size:.85rem;color:var(--muted)}.all{display:grid;gap:7px}.all button{border:0;background:#f3ece1;border-radius:12px;text-align:left;padding:11px 12px;min-height:48px;display:flex;gap:9px;align-items:center}.all button.current{background:var(--greenSoft);box-shadow:inset 0 0 0 2px #b7cfbd}.all button.done{opacity:.55}.all .idx{width:27px;height:27px;display:grid;place-items:center;background:white;border-radius:50%;font-size:.78rem;font-weight:900;flex:0 0 auto}
+    .bottom{position:fixed;left:0;right:0;bottom:0;z-index:50;padding:8px 12px calc(8px + env(safe-area-inset-bottom));background:rgba(255,253,248,.97);backdrop-filter:blur(16px);border-top:1px solid var(--line)}.bottom-inner{width:min(760px,100%);margin:auto;display:grid;grid-template-columns:1fr 1.7fr;gap:8px}.nav{min-height:56px;border-radius:14px;border:1px solid var(--line);font-weight:950;background:white}.nav.next{background:var(--accent);border-color:var(--accent);color:white}.nav:disabled{opacity:.4}
+    @media(min-width:720px){body{font-size:18px}.step-card{padding:25px 26px;min-height:440px}}@media print{.topbar,.bottom,.actions{display:none}body{padding:0;background:white}.card{box-shadow:none}}
   </style>
 </head>
 <body>
-  <header class="wrap">
-    <div class="eyebrow">CHATGPT COOKS · 手機料理模式</div>
-    <h1>蝦・鮮蚵・櫛瓜<br>檸檬奶油燉飯</h1>
-    <p class="subtitle">用你實際買到的三好米星川壽司米、新鮮蒜頭、草蝦、鮮蚵、櫛瓜與史雲生清雞湯。</p>
-    <div class="chips" aria-label="料理摘要">
-      <span class="chip">約 40–50 分鐘</span>
-      <span class="chip">Le Creuset 27cm</span>
-      <span class="chip">星川壽司米</span>
-      <span class="chip">不放起司</span>
-    </div>
-  </header>
-
-  <div class="topbar">
-    <div class="wrap topbar-inner">
-      <div class="seg" id="servings" aria-label="份量">
-        <button class="active" data-serving="2">2 人</button>
-        <button data-serving="4">4 人</button>
-      </div>
-      <button class="wake" id="wakeBtn" type="button">保持螢幕亮</button>
-    </div>
-    <div class="progress-mini"><div id="progressBar"></div></div>
-  </div>
-
-  <main class="wrap">
-    <div class="card quick-note">
-      <strong>這版已修正：</strong>星川壽司米不洗不泡；蝦先煎到剛熟，最後只回鍋加熱；鮮蚵在米還差 3–4 分鐘時下鍋並煮到不透明、邊緣微捲。
-    </div>
-
-    <div class="cook-head">
-      <h2>現在做這一步</h2>
-      <div class="step-count" id="stepCount"></div>
-    </div>
-    <section class="card step-card" id="stepCard" aria-live="polite"></section>
-
-    <details class="card" id="ingredientDetails">
-      <summary>完整食材</summary>
-      <div class="details-body" id="ingredientList"></div>
-    </details>
-
-    <details class="card" id="allStepsDetails">
-      <summary>全部步驟</summary>
-      <div class="details-body all-steps" id="allSteps"></div>
-    </details>
-
-    <details class="card">
-      <summary>最後怎樣算成功</summary>
-      <div class="details-body">
-        <p><strong>米：</strong>外層柔軟，中間仍有一點咬感，但沒有粉粉硬芯。</p>
-        <p><strong>質地：</strong>起鍋前比你想吃的狀態稍微稀一點；晃鍋會有波浪感，盛盤後能慢慢攤開。</p>
-        <p><strong>蝦：</strong>完全不透明、剛有彈性，不要煮到緊縮成小圈。</p>
-        <p><strong>鮮蚵：</strong>乳白不透明、邊緣微捲、仍然飽滿。</p>
-        <p><strong>調味：</strong>最後才決定要不要鹽。雞湯、蝦與鮮蚵本身都會增加鹹鮮味。</p>
-      </div>
-    </details>
-  </main>
-
-  <nav class="bottom-nav" aria-label="料理步驟控制">
-    <div class="bottom-nav-inner">
-      <button class="nav-btn" id="prevBtn" type="button">← 上一步</button>
-      <button class="nav-btn next" id="nextBtn" type="button">完成這步 →</button>
-    </div>
-  </nav>
-
-  <script>
-    const recipe = {
-      ingredients: [
-        ["三好米 星川壽司米", "180 g", "360 g"],
-        ["帶頭草蝦", "1 盒", "2 盒"],
-        ["鮮蚵", "120–150 g", "220–300 g"],
-        ["櫛瓜", "1 根（約 180–220 g）", "1.5–2 根（約 350–400 g）"],
-        ["洋蔥", "1/2 顆", "1 顆"],
-        ["新鮮蒜頭", "1 大瓣／2 小瓣", "2 大瓣／3–4 小瓣"],
-        ["史雲生極鮮清雞湯", "400 ml", "800 ml"],
-        ["水（熬蝦湯）", "250 ml", "400 ml"],
-        ["額外熱水（備用）", "150–200 ml", "250–300 ml"],
-        ["無鹽奶油", "20 g", "35–40 g"],
-        ["食用油／橄欖油", "約 1 大匙", "約 1.5–2 大匙"],
-        ["1:4 稀釋檸檬汁", "先 10–20 ml，最多約 30 ml", "先 20–40 ml，最多約 50 ml"],
-        ["乾白酒（可省）", "50 ml", "80–100 ml"],
-        ["黑胡椒、鹽", "最後調味", "最後調味"]
-      ],
-      steps: [
-        {
-          title:"全部備料先到位",
-          time:"5–8 分鐘",
-          timer:0,
-          body:`<p>準備一個小鍋做高湯、Le Creuset 27cm 做燉飯。</p><ul><li><strong>星川壽司米直接秤好，不洗、不泡。</strong></li><li>奶油繼續放冰箱，最後才拿。</li><li>另外燒一壺熱水備用，不先倒進高湯。</li></ul>`,
-          cue:`<strong>先不要開燉飯鍋。</strong>開始加湯後最好不要離鍋，所以現在先把東西都排好。`
-        },
-        {
-          title:"處理草蝦",
-          time:"5 分鐘",
-          timer:0,
-          body:`<p>拔蝦頭、剝殼，<strong>蝦頭和蝦殼全部留下</strong>。蝦肉開背去腸泥，擦乾後先放冰箱。</p>`,
-          cue:`頭殼等等拿來把雞湯升級成蝦高湯；蝦肉保持乾燥，等等比較容易煎出香氣。`
-        },
-        {
-          title:"做快速蝦殼雞高湯",
-          time:"約 12 分鐘",
-          timer:600,
-          body:`<p>小鍋加 1 小匙油，中火把蝦頭蝦殼炒 <strong>2–3 分鐘</strong>，用木匙稍微壓蝦頭。</p><p>加入 <strong><span data-dyn="stock"></span></strong>。煮滾後轉小火，微滾 <strong>8–10 分鐘</strong>。</p><p>過濾掉蝦頭蝦殼，湯留在小火上保持熱。</p>`,
-          warning:`<strong>這一步沒有米。</strong>米只會在 Le Creuset 裡煮。`
-        },
-        {
-          title:"處理鮮蚵",
-          time:"2–3 分鐘",
-          timer:0,
-          body:`<p>倒掉盒中液體，用冷水快速、輕柔沖洗，挑掉碎殼後充分瀝乾，放回冰箱。</p>`,
-          warning:`不要搓洗，也不要長時間泡水。`
-        },
-        {
-          title:"切櫛瓜、洋蔥、蒜",
-          time:"5 分鐘",
-          timer:0,
-          body:`<p>櫛瓜切 <strong>1–1.5 cm 丁</strong>；洋蔥切細丁；蒜頭切末。</p><p>份量：<strong><span data-dyn="veg"></span></strong>。</p>`,
-          cue:`櫛瓜不要切太小，等等要先煎上色，最後再回鍋保留口感。`
-        },
-        {
-          title:"先煎櫛瓜",
-          time:"3–4 分鐘",
-          timer:180,
-          body:`<p>Le Creuset 用<strong>中火</strong>逐步預熱，加少量油。櫛瓜鋪平後先讓一面上色再翻。</p><p>外面微金黃、裡面仍有硬度就盛出。</p>`,
-          warning:`這一步先不要撒鹽，避免櫛瓜提早大量出水。`
-        },
-        {
-          title:"把蝦煎到剛好全熟",
-          time:"約 2–3 分鐘",
-          timer:120,
-          body:`<p>同一鍋補少量油，中火到中大火煎蝦。依蝦大小每面約 <strong>45–75 秒</strong>。</p><p>看到蝦肉完全不透明、剛有彈性就盛出。</p>`,
-          cue:`最後回鍋只會加熱 30–60 秒，所以現在要把蝦真正煎熟，但不要煎老。`
-        },
-        {
-          title:"炒洋蔥，再下新鮮蒜",
-          time:"3–4 分鐘",
-          timer:180,
-          body:`<p>降到中小火。洋蔥炒到柔軟、半透明，約 3–4 分鐘。</p><p>加入蒜末，炒 <strong>20–30 秒</strong>，一聞到蒜香就準備下米。</p>`,
-          warning:`蒜不要炒成咖啡色，焦蒜味會蓋掉海鮮。`
-        },
-        {
-          title:"生米下鍋炒",
-          time:"2 分鐘",
-          timer:120,
-          body:`<p>加入 <strong><span data-dyn="rice"></span></strong> 星川壽司米，中火翻炒約 2 分鐘，讓米均勻沾到鍋內油脂。</p>`,
-          cue:`看到米粒表面有油亮感即可；不用追求像 Arborio 一樣的外透明內白。`
-        },
-        {
-          title:"有白酒就加，沒有直接跳過",
-          time:"1–2 分鐘",
-          timer:90,
-          body:`<p>若有乾白酒，加入 <strong><span data-dyn="wine"></span></strong>，中火煮到明顯酒精味散去。</p><p>沒買白酒就直接下一步。</p>`,
-          warning:`不要用那瓶稀釋檸檬汁代替白酒；檸檬留到最後。`
-        },
-        {
-          title:"開始分次加熱高湯",
-          time:"約 11–14 分鐘",
-          timer:0,
-          body:`<p>第一輪加入 <strong><span data-dyn="firstStock"></span></strong> 熱高湯，保持溫和小滾。</p><p>之後每次加入 <strong><span data-dyn="nextStock"></span></strong>；前一輪大多被吸收再補下一輪。</p><p>每 20–30 秒輕拌幾下即可。<strong>從加第一輪高湯開始計時，第 11–12 分鐘就開始試米。</strong></p>`,
-          cue:`米還硬但高湯快沒了，就用旁邊準備的熱水繼續補。不要為了配方數字硬停。`
-        },
-        {
-          title:"判斷米還差 3–4 分鐘",
-          time:"靠試吃",
-          timer:0,
-          body:`<p>從第 11–12 分鐘開始，每 1–2 分鐘吃一顆。</p><p>當外層已軟、中心仍明顯偏硬，但你覺得<strong>再 3–4 分鐘會剛好</strong>，就進下一步。</p>`,
-          cue:`星川壽司米不是 Arborio，總時間可能約 15–18 分鐘，也可能更久。<strong>試吃比計時重要。</strong>`
-        },
-        {
-          title:"鮮蚵下鍋",
-          time:"至少約 3 分鐘",
-          timer:180,
-          body:`<p>把瀝乾鮮蚵輕輕拌入，保持小滾。</p><p>讓鮮蚵煮到<strong>乳白不透明、邊緣微捲</strong>，同時米繼續吸湯。</p>`,
-          safe:`鮮蚵不要只燙一下就起鍋。若仍偏透明或軟生，就繼續煮到完全不透明。`
-        },
-        {
-          title:"櫛瓜回鍋",
-          time:"約 1 分鐘",
-          timer:60,
-          body:`<p>米已接近完成、鮮蚵也幾乎熟時，把煎好的櫛瓜拌回去。</p>`,
-          cue:`只要重新加熱，不要把櫛瓜繼續煮到軟爛。`
-        },
-        {
-          title:"熟蝦最後回鍋",
-          time:"30–60 秒",
-          timer:45,
-          body:`<p>把先前已煎熟的蝦放回去，拌勻、加熱 <strong>30–60 秒</strong>。</p>`,
-          warning:`不要再煮 2–3 分鐘；蝦會很快變乾硬。`
-        },
-        {
-          title:"把流動度調對",
-          time:"30–60 秒",
-          timer:0,
-          body:`<p>晃鍋時整鍋應該有波浪感，而且<strong>比你最後想吃的狀態稍微稀一點</strong>。</p><ul><li>太乾：補 30–50 ml 熱高湯／熱水。</li><li>太水：再小滾 30–60 秒。</li></ul>`,
-          cue:`Le Creuset 關火後還會繼續放熱，所以現在寧可略稀，不要收得太乾。`
-        },
-        {
-          title:"關火，拌冷奶油",
-          time:"30–45 秒",
-          timer:40,
-          body:`<p><strong>先關火。</strong>再加入冰箱拿出的無鹽奶油 <strong><span data-dyn="butter"></span></strong>。</p><p>快速但輕柔地拌 30–45 秒，讓湯汁、澱粉和奶油乳化。</p>`,
-          warning:`一定先關火再放奶油。`
-        },
-        {
-          title:"檸檬、黑胡椒、最後才決定鹽",
-          time:"1 分鐘",
-          timer:0,
-          body:`<p>先加你那瓶 1:4 稀釋檸檬汁 <strong><span data-dyn="lemon"></span></strong>，拌勻後試味道。</p><p>磨黑胡椒，再吃一口；只有真的不夠鹹才補鹽。</p>`,
-          cue:`完成後立刻盛盤。燉飯應該能在盤上慢慢攤開，不是一坨站住。`
-        }
-      ]
-    };
-
-    let servings = Number(localStorage.getItem("cook-servings")) || 2;
-    let current = Math.min(Number(localStorage.getItem("cook-step")) || 0, recipe.steps.length - 1);
-    let timerId = null;
-    let timerRemaining = 0;
-    let wakeLock = null;
-
-    const dyn = {
-      stock:()=>servings===2?"400 ml 雞湯＋250 ml 水":"800 ml 雞湯＋400 ml 水",
-      veg:()=>servings===2?"櫛瓜 1 根＋洋蔥 1/2 顆＋蒜 1 大瓣／2 小瓣":"櫛瓜 1.5–2 根＋洋蔥 1 顆＋蒜 2 大瓣／3–4 小瓣",
-      rice:()=>servings===2?"180 g":"360 g",
-      wine:()=>servings===2?"50 ml":"80–100 ml",
-      firstStock:()=>servings===2?"約 120 ml":"約 180 ml",
-      nextStock:()=>servings===2?"80–100 ml":"120–150 ml",
-      butter:()=>servings===2?"20 g":"35–40 g",
-      lemon:()=>servings===2?"先 10–20 ml":"先 20–40 ml"
-    };
-
-    const stepCard=document.getElementById("stepCard");
-    const stepCount=document.getElementById("stepCount");
-    const progressBar=document.getElementById("progressBar");
-    const prevBtn=document.getElementById("prevBtn");
-    const nextBtn=document.getElementById("nextBtn");
-    const ingredientList=document.getElementById("ingredientList");
-    const allSteps=document.getElementById("allSteps");
-
-    function applyDynamic(root=document){
-      root.querySelectorAll("[data-dyn]").forEach(el=>{
-        const fn=dyn[el.dataset.dyn];
-        if(fn) el.textContent=fn();
-      });
-    }
-
-    function renderIngredients(){
-      ingredientList.innerHTML=recipe.ingredients.map(([name,two,four])=>`<div class="ingredient"><span>${name}</span><span class="qty">${servings===2?two:four}</span></div>`).join("")+
-        `<p class="small">這鍋不使用雞腿肉、玉米筍、金針菇、鴻喜菇、甜椒或 Parmesan。</p>`;
-    }
-
-    function renderAllSteps(){
-      allSteps.innerHTML=recipe.steps.map((s,i)=>`<button type="button" class="all-step ${i===current?"current":""} ${i<current?"done":""}" data-jump="${i}"><span>${i+1}</span><strong>${s.title}</strong></button>`).join("");
-      allSteps.querySelectorAll("[data-jump]").forEach(btn=>btn.addEventListener("click",()=>{
-        current=Number(btn.dataset.jump); save(); render();
-        document.getElementById("allStepsDetails").open=false;
-        window.scrollTo({top:0,behavior:"smooth"});
-      }));
-    }
-
-    function render(){
-      stopTimer();
-      const s=recipe.steps[current];
-      stepCard.innerHTML=`
-        <div class="step-meta"><span class="step-no">${current+1}</span><span class="time-pill">${s.time}</span></div>
-        <h3>${s.title}</h3>
-        <div>${s.body}</div>
-        ${s.cue?`<div class="cue">${s.cue}</div>`:""}
-        ${s.warning?`<div class="warning">${s.warning}</div>`:""}
-        ${s.safe?`<div class="safe">${s.safe}</div>`:""}
-        <div class="step-actions">
-          ${s.timer?`<button type="button" class="action-btn" id="timerBtn">開始 ${formatTime(s.timer)} 計時</button><span class="action-btn timer-readout" id="timerReadout" hidden></span>`:""}
-        </div>`;
-      applyDynamic(stepCard);
-      stepCount.textContent=`${current+1} / ${recipe.steps.length}`;
-      progressBar.style.width=`${(current/(recipe.steps.length-1))*100}%`;
-      prevBtn.disabled=current===0;
-      nextBtn.textContent=current===recipe.steps.length-1?"完成料理":"完成這步 →";
-      renderAllSteps();
-      if(s.timer){document.getElementById("timerBtn").addEventListener("click",()=>startTimer(s.timer));}
-    }
-
-    function save(){
-      localStorage.setItem("cook-step",String(current));
-      localStorage.setItem("cook-servings",String(servings));
-    }
-
-    prevBtn.addEventListener("click",()=>{
-      if(current>0){current--;save();render();window.scrollTo({top:0,behavior:"smooth"});}
-    });
-    nextBtn.addEventListener("click",()=>{
-      if(current<recipe.steps.length-1){current++;save();render();window.scrollTo({top:0,behavior:"smooth"});}
-      else{
-        stepCard.innerHTML=`<div class="finish"><h3>完成，可以盛盤了</h3><p>如果燉飯還能慢慢攤開、蝦剛熟、鮮蚵飽滿不透明，就是這鍋要的狀態。</p><button class="action-btn primary" type="button" id="restartBtn">下次從第 1 步開始</button></div>`;
-        document.getElementById("restartBtn").addEventListener("click",()=>{current=0;save();render();});
-        nextBtn.disabled=true;
-      }
-    });
-
-    document.querySelectorAll("#servings button").forEach(btn=>{
-      if(Number(btn.dataset.serving)===servings) btn.classList.add("active"); else btn.classList.remove("active");
-      btn.addEventListener("click",()=>{
-        servings=Number(btn.dataset.serving);
-        document.querySelectorAll("#servings button").forEach(b=>b.classList.toggle("active",b===btn));
-        save();renderIngredients();render();
-      });
-    });
-
-    function formatTime(sec){
-      const m=Math.floor(sec/60),s=sec%60;
-      return s?`${m}:${String(s).padStart(2,"0")}`:`${m} 分鐘`;
-    }
-    function stopTimer(){
-      if(timerId){clearInterval(timerId);timerId=null;}
-      timerRemaining=0;
-    }
-    function startTimer(sec){
-      stopTimer(); timerRemaining=sec;
-      const btn=document.getElementById("timerBtn");
-      const out=document.getElementById("timerReadout");
-      btn.classList.add("running"); btn.textContent="重新計時"; out.hidden=false;
-      const tick=()=>{
-        const m=Math.floor(timerRemaining/60),s=timerRemaining%60;
-        out.textContent=`${m}:${String(s).padStart(2,"0")}`;
-        if(timerRemaining<=0){
-          clearInterval(timerId);timerId=null;out.textContent="時間到";
-          if(navigator.vibrate) navigator.vibrate([180,100,180]);
-          return;
-        }
-        timerRemaining--;
-      };
-      tick(); timerId=setInterval(tick,1000);
-    }
-
-    const wakeBtn=document.getElementById("wakeBtn");
-    async function requestWake(){
-      if(!("wakeLock" in navigator)){
-        wakeBtn.textContent="瀏覽器不支援常亮"; wakeBtn.disabled=true; return;
-      }
-      try{
-        wakeLock=await navigator.wakeLock.request("screen");
-        wakeBtn.textContent="螢幕保持亮 ✓"; wakeBtn.classList.add("on");
-        wakeLock.addEventListener("release",()=>{wakeBtn.textContent="保持螢幕亮";wakeBtn.classList.remove("on");});
-      }catch(e){wakeBtn.textContent="無法保持常亮";}
-    }
-    wakeBtn.addEventListener("click",async()=>{
-      if(wakeLock && !wakeLock.released){await wakeLock.release();wakeLock=null;}
-      else await requestWake();
-    });
-    document.addEventListener("visibilitychange",async()=>{
-      if(document.visibilityState==="visible" && wakeBtn.classList.contains("on") && (!wakeLock || wakeLock.released)) await requestWake();
-    });
-
-    renderIngredients();
-    render();
-  </script>
-</body>
-</html>
+<header class="wrap"><div class="eyebrow">CHATGPT COOKS · 手機料理模式</div><h1>蝦・鮮蚵・櫛瓜<br>檸檬奶油燉飯</h1><p class="subtitle">三好米星川壽司米＋新鮮蒜頭。每一步都寫「火力、何時下鍋、看到／聽到什麼才算對」。</p><div class="chips"><span class="chip">約 40–50 分鐘</span><span class="chip">Le Creuset 27cm</span><span class="chip">星川壽司米</span><span class="chip">不放起司</span></div></header>
+<div class="topbar"><div class="wrap topbar-inner"><div class="seg" id="servings"><button class="active" data-serving="2">2 人</button><button data-serving="4">4 人</button></div><button class="wake" id="wakeBtn" type="button">保持螢幕亮</button></div><div class="progress"><div id="progressBar"></div></div></div>
+<main class="wrap">
+  <div class="card quick"><strong>看聲音，不只看時間：</strong>煎櫛瓜／蝦時，下鍋應立刻有清楚的「滋滋」聲；完全沒聲代表鍋還不夠熱，猛烈爆油或冒煙代表太熱。洋蔥則只要溫和滋滋聲。</div>
+  <div class="cook-head"><h2>現在做這一步</h2><div class="count" id="stepCount"></div></div>
+  <section class="card step-card" id="stepCard"></section>
+  <details class="card"><summary>完整食材</summary><div class="details-body" id="ingredientList"></div></details>
+  <details class="card" id="allStepsDetails"><summary>全部步驟</summary><div class="details-body all" id="allSteps"></div></details>
+  <details class="card"><summary>火候速查</summary><div class="details-body"><p><strong>中小火：</strong>洋蔥、蒜、燉飯吸湯。聲音偏柔和。</p><p><strong>中火：</strong>大部分操作。油會變稀、流動更快，但不冒煙。</p><p><strong>中大火：</strong>只短暫用來煎蝦／櫛瓜上色。若油開始冒煙，立刻降火。</p><p><strong>Le Creuset：</strong>不要乾鍋大火空燒。先放油再加熱，較容易控制。</p></div></details>
+</main>
+<nav class="bottom"><div class="bottom-inner"><button class="nav" id="prevBtn">← 上一步</button><button class="nav next" id="nextBtn">完成這步 →</button></div></nav>
+<script>
+const ingredients=[["三好米 星川壽司米","180 g","360 g"],["帶頭草蝦","1 盒","2 盒"],["鮮蚵","120–150 g","220–300 g"],["櫛瓜","1 根","1.5–2 根"],["洋蔥","1/2 顆","1 顆"],["新鮮蒜頭","1 大瓣／2 小瓣","2 大瓣／3–4 小瓣"],["史雲生極鮮清雞湯","400 ml","800 ml"],["水（熬蝦湯）","250 ml","400 ml"],["額外熱水（備用）","150–200 ml","250–300 ml"],["無鹽奶油","20 g","35–40 g"],["食用油／橄欖油","約 1 大匙","約 1.5–2 大匙"],["1:4 稀釋檸檬汁","先 10–20 ml","先 20–40 ml"],["乾白酒（可省）","50 ml","80–100 ml"],["黑胡椒、鹽","最後調味","最後調味"]];
+let servings=Number(localStorage.getItem('cook-servings'))||2,current=Math.min(Number(localStorage.getItem('cook-step'))||0,17),timerId=null,wakeLock=null;
+const d={stock:()=>servings===2?'400 ml 雞湯＋250 ml 水':'800 ml 雞湯＋400 ml 水',veg:()=>servings===2?'櫛瓜 1 根＋洋蔥 1/2 顆＋蒜 1 大瓣／2 小瓣':'櫛瓜 1.5–2 根＋洋蔥 1 顆＋蒜 2 大瓣／3–4 小瓣',rice:()=>servings===2?'180 g':'360 g',wine:()=>servings===2?'50 ml':'80–100 ml',first:()=>servings===2?'約 120 ml':'約 180 ml',next:()=>servings===2?'80–100 ml':'120–150 ml',butter:()=>servings===2?'20 g':'35–40 g',lemon:()=>servings===2?'先 10–20 ml':'先 20–40 ml'};
+const steps=[
+{t:'全部備料先到位',time:'5–8 分鐘',body:`<p><strong>星川壽司米直接秤好，不洗、不泡。</strong>奶油繼續冰著。另燒一壺熱水備用。</p><p>準備小鍋做高湯、Le Creuset 做燉飯。</p>`,heat:'這一步不用開 Le Creuset。先把食材切好、秤好，後面才不會邊煮邊找東西。'},
+{t:'處理草蝦',time:'5 分鐘',body:`<p>拔蝦頭、剝殼，<strong>蝦頭蝦殼全部留下</strong>。蝦肉開背去腸泥、擦乾、冷藏。</p>`,cue:'蝦肉越乾，等等越容易煎出香味，不會先出一灘水。'},
+{t:'做快速蝦殼雞高湯',time:'約 12 分鐘',timer:600,body:`<p>小鍋先放 <strong>1 小匙油</strong>，再開中火。</p><p>油加熱約 30–60 秒，變得比較流動時丟一片蝦殼測試：<strong>立刻有滋滋聲</strong>就可以把全部蝦頭蝦殼下鍋。</p><p>炒 2–3 分鐘，稍微壓蝦頭，再加入 <strong><span data-dyn="stock"></span></strong>。煮滾後轉小火，微滾 8–10 分鐘，再過濾並保持熱。</p>`,heat:'正確聲音：清楚滋滋聲，但不要猛烈爆油。完全沒聲＝再等 15–30 秒；冒煙＝太熱，先離火／降火。',warn:'這一步完全沒有米、洋蔥或蒜。只有油、蝦頭蝦殼、雞湯和水。'},
+{t:'處理鮮蚵',time:'2–3 分鐘',body:`<p>倒掉盒中液體，用冷水快速輕柔沖洗，挑掉碎殼後充分瀝乾，再放回冰箱。</p>`,warn:'不要搓洗，也不要泡水。'},
+{t:'切櫛瓜、洋蔥、蒜',time:'5 分鐘',body:`<p>櫛瓜不用去皮，洗淨、切掉頭尾後切 <strong>1–1.5 cm 丁</strong>；洋蔥細丁；蒜切末。</p><p><strong><span data-dyn="veg"></span></strong></p>`,cue:'櫛瓜留皮比較不容易煮爛，口感也較好。'},
+{t:'先煎櫛瓜',time:'3–4 分鐘',timer:180,body:`<p><strong>冷鍋先放約 2 小匙油，再開中火。</strong>等約 1–2 分鐘，晃鍋時油能很順地滑動。</p><p>先丟 1 塊櫛瓜測試：若立刻有明顯滋滋聲，就把其餘櫛瓜鋪平下鍋。先不要一直翻，讓一面上色約 1 分鐘再翻。</p><p>外面微金黃、裡面還有硬度就盛出。</p>`,heat:'下鍋要「滋滋」但不爆。若櫛瓜放下去安靜無聲，先別把全部倒進去；再熱 20–30 秒。',warn:'先不要加鹽，避免櫛瓜提早大量出水。'},
+{t:'把蝦煎到剛好全熟',time:'約 2–3 分鐘',timer:120,body:`<p>同一鍋看油量，太乾才補 1 小匙油。維持中火到中大火。</p><p>放 1 隻蝦測試；一碰鍋就有明顯滋滋聲才下剩下的。每面約 45–75 秒。</p><p>蝦肉完全不透明、剛有彈性就盛出。</p>`,heat:'聲音可以比櫛瓜更明顯，但油不能冒煙。若蝦一下鍋大量出水、聲音很弱，表示鍋不夠熱或一次放太多。',cue:'最後只回鍋 30–60 秒，所以現在要真正煎熟，但不要煎老。'},
+{t:'炒洋蔥，再下新鮮蒜',time:'3–4 分鐘',timer:180,body:`<p>把火降到<strong>中小火</strong>。如果鍋底很乾，補 1 小匙油。</p><p>洋蔥下鍋時只需要<strong>溫和滋滋聲</strong>，炒 3–4 分鐘到柔軟、半透明。</p><p>再下蒜末，炒 20–30 秒；一聞到明顯蒜香就立刻進下一步。</p>`,heat:'洋蔥不是在「煎焦」，所以不用等到很大聲。若洋蔥邊緣很快變褐色，火太大。',warn:'蒜不要炒成咖啡色，焦蒜會蓋掉海鮮。'},
+{t:'生米下鍋炒',time:'2 分鐘',timer:120,body:`<p>加入 <strong><span data-dyn="rice"></span></strong> 星川壽司米，轉中火翻炒約 2 分鐘。</p><p>讓每顆米都沾到油脂，米表面看起來油亮即可。</p>`,heat:'這時會聽到乾爽細小的沙沙／滋滋聲，不應該有爆油聲。若鍋底開始焦，降火。'},
+{t:'有白酒就加，沒有跳過',time:'1–2 分鐘',timer:90,body:`<p>若有乾白酒，加入 <strong><span data-dyn="wine"></span></strong>。會立刻出現較大的嘶聲和蒸氣，這是正常的。</p><p>中火煮到明顯酒精味散去；沒白酒直接下一步。</p>`,heat:'酒倒下去後先讓它沸騰，再攪拌。液體幾乎收乾、鍋底不再一灘酒時就可以加高湯。',warn:'不要用稀釋檸檬汁代替白酒。'},
+{t:'開始分次加熱高湯',time:'約 11–14 分鐘',body:`<p>第一輪加入 <strong><span data-dyn="first"></span></strong> 熱高湯。之後每次加 <strong><span data-dyn="next"></span></strong>。</p><p>保持<strong>小滾</strong>：表面持續有小泡泡冒出，但不是整鍋劇烈翻滾。</p><p>前一輪大多被吸收後才補下一輪，每 20–30 秒輕拌幾下。</p>`,heat:'判斷何時補湯：木匙劃過鍋底，能看到鍋底 1–2 秒後才慢慢被米填回，就可以再加。',cue:'從第一輪高湯下鍋開始計時，第 11–12 分鐘開始試米。高湯不夠就補旁邊的熱水。'},
+{t:'判斷米還差 3–4 分鐘',time:'靠試吃',body:`<p>第 11–12 分鐘起，每 1–2 分鐘吃一顆。</p><p>當外層已軟、中心還明顯偏硬，但你覺得再煮 3–4 分鐘就會剛好，就進下一步。</p>`,cue:'不要追固定分鐘。星川壽司米可能 15–18 分鐘，也可能更久；試吃比計時重要。'},
+{t:'鮮蚵下鍋',time:'至少約 3 分鐘',timer:180,body:`<p>把瀝乾鮮蚵輕輕拌入，保持小滾。</p><p>鮮蚵要煮到<strong>乳白不透明、邊緣微捲</strong>。</p>`,heat:'鮮蚵下去後鍋溫會掉一點。等小泡泡重新出現再開始算「煮的時間」比較準。',safe:'如果仍偏透明、軟生，就繼續煮，不要只看計時器。'},
+{t:'櫛瓜回鍋',time:'約 1 分鐘',timer:60,body:`<p>米已接近完成、鮮蚵幾乎熟時，把煎好的櫛瓜拌回去。</p>`,heat:'維持小滾即可。這一步只是加熱櫛瓜，不是再煮熟它。'},
+{t:'熟蝦最後回鍋',time:'30–60 秒',timer:45,body:`<p>把先前已煎熟的蝦放回去，拌勻，加熱 30–60 秒。</p>`,heat:'只要整鍋恢復熱度就好，不需要再次大滾。',warn:'不要多煮 2–3 分鐘，蝦會很快變乾硬。'},
+{t:'把流動度調對',time:'30–60 秒',body:`<p>晃鍋時整鍋應有波浪感，而且比最後想吃的狀態稍微稀一點。</p><ul><li>太乾：補 30–50 ml 熱高湯／熱水。</li><li>太水：小滾 30–60 秒。</li></ul>`,cue:'Le Creuset 關火後還會持續放熱，所以現在寧可稍稀，不要收太乾。'},
+{t:'關火，拌冷奶油',time:'30–45 秒',timer:40,body:`<p><strong>先關火。</strong>加入冰箱拿出的無鹽奶油 <strong><span data-dyn="butter"></span></strong>，快速但輕柔拌 30–45 秒。</p>`,heat:'這一步完全不用火。若鍋還在大滾，先等 5–10 秒再拌奶油。',cue:'拌好後應該變得更滑、更有光澤。'},
+{t:'檸檬、黑胡椒、最後才決定鹽',time:'1 分鐘',body:`<p>先加 1:4 稀釋檸檬汁 <strong><span data-dyn="lemon"></span></strong>，拌勻試味道。</p><p>磨黑胡椒，再吃一口；只有真的不夠鹹才補鹽。</p>`,cue:'完成後立刻盛盤。燉飯應能在盤上慢慢攤開，不是一坨站住。'}
+];
+const stepCard=document.getElementById('stepCard'),stepCount=document.getElementById('stepCount'),progressBar=document.getElementById('progressBar'),prevBtn=document.getElementById('prevBtn'),nextBtn=document.getElementById('nextBtn'),ingredientList=document.getElementById('ingredientList'),allSteps=document.getElementById('allSteps');
+function dyn(root=document){root.querySelectorAll('[data-dyn]').forEach(el=>{const fn=d[el.dataset.dyn];if(fn)el.textContent=fn()})}function save(){localStorage.setItem('cook-step',current);localStorage.setItem('cook-servings',servings)}function stopTimer(){if(timerId){clearInterval(timerId);timerId=null}}
+function renderIngredients(){ingredientList.innerHTML=ingredients.map(x=>`<div class="ingredient"><span>${x[0]}</span><span class="qty">${servings===2?x[1]:x[2]}</span></div>`).join('')}
+function renderAll(){allSteps.innerHTML=steps.map((s,i)=>`<button class="${i===current?'current':''} ${i<current?'done':''}" data-jump="${i}"><span class="idx">${i+1}</span><strong>${s.t}</strong></button>`).join('');allSteps.querySelectorAll('[data-jump]').forEach(b=>b.onclick=()=>{current=+b.dataset.jump;save();render();document.getElementById('allStepsDetails').open=false;scrollTo({top:0,behavior:'smooth'})})}
+function fmt(sec){let m=Math.floor(sec/60),s=sec%60;return s?`${m}:${String(s).padStart(2,'0')}`:`${m} 分鐘`}
+function render(){stopTimer();const s=steps[current];stepCard.innerHTML=`<div class="meta"><span class="no">${current+1}</span><span class="pill">${s.time}</span></div><h3>${s.t}</h3><div>${s.body}</div>${s.heat?`<div class="heat"><div class="label">火力／下鍋時機</div>${s.heat}</div>`:''}${s.cue?`<div class="cue"><div class="label">看到這樣就對了</div>${s.cue}</div>`:''}${s.warn?`<div class="warn"><div class="label">注意</div>${s.warn}</div>`:''}${s.safe?`<div class="safe"><div class="label">熟度</div>${s.safe}</div>`:''}<div class="actions">${s.timer?`<button class="action" id="timerBtn">開始 ${fmt(s.timer)} 計時</button><span class="action readout" id="timerOut" hidden></span>`:''}</div>`;dyn(stepCard);stepCount.textContent=`${current+1} / ${steps.length}`;progressBar.style.width=`${current/(steps.length-1)*100}%`;prevBtn.disabled=current===0;nextBtn.textContent=current===steps.length-1?'完成料理':'完成這步 →';renderAll();if(s.timer)document.getElementById('timerBtn').onclick=()=>startTimer(s.timer)}
+function startTimer(sec){stopTimer();let remain=sec,btn=document.getElementById('timerBtn'),out=document.getElementById('timerOut');btn.classList.add('running');btn.textContent='重新計時';out.hidden=false;const tick=()=>{let m=Math.floor(remain/60),s=remain%60;out.textContent=`${m}:${String(s).padStart(2,'0')}`;if(remain<=0){clearInterval(timerId);timerId=null;out.textContent='時間到';if(navigator.vibrate)navigator.vibrate([180,100,180]);return}remain--};tick();timerId=setInterval(tick,1000)}
+prevBtn.onclick=()=>{if(current>0){current--;save();render();scrollTo({top:0,behavior:'smooth'})}};nextBtn.onclick=()=>{if(current<steps.length-1){current++;save();render();scrollTo({top:0,behavior:'smooth'})}else{nextBtn.disabled=true;stepCard.innerHTML='<h3>完成，可以盛盤了</h3><p>米有咬感、鮮蚵不透明、蝦仍有彈性，燉飯能慢慢攤開，就是正確狀態。</p>'}};
+document.querySelectorAll('#servings button').forEach(b=>{b.classList.toggle('active',+b.dataset.serving===servings);b.onclick=()=>{servings=+b.dataset.serving;document.querySelectorAll('#servings button').forEach(x=>x.classList.toggle('active',x===b));save();renderIngredients();render()}});
+const wakeBtn=document.getElementById('wakeBtn');async function requestWake(){if(!('wakeLock'in navigator)){wakeBtn.textContent='瀏覽器不支援常亮';wakeBtn.disabled=true;return}try{wakeLock=await navigator.wakeLock.request('screen');wakeBtn.textContent='螢幕保持亮 ✓';wakeBtn.classList.add('on');wakeLock.addEventListener('release',()=>{wakeBtn.textContent='保持螢幕亮';wakeBtn.classList.remove('on')})}catch(e){wakeBtn.textContent='無法保持常亮'}}wakeBtn.onclick=async()=>{if(wakeLock&&!wakeLock.released){await wakeLock.release();wakeLock=null}else await requestWake()};
+renderIngredients();render();
+</script></body></html>
